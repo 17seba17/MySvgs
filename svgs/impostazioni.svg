@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   data-date="24-07-2025"
+   data-title="Icona delle impostazioni"
+   data-description="La mia seconda creazione"
+   width="500mm"
+   height="500mm"
+   viewBox="0 0 500 500"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="impostazioni.svg"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.20168158"
+     inkscape:cx="414.01897"
+     inkscape:cy="954.47487"
+     inkscape:window-width="1920"
+     inkscape:window-height="991"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <inkscape:path-effect
+       effect="copy_rotate"
+       starting_point="0,0"
+       origin="250,250"
+       id="path-effect8"
+       is_visible="true"
+       lpeversion="1.2"
+       lpesatellites=""
+       method="fuse_paths"
+       num_copies="6"
+       starting_angle="0"
+       rotation_angle="60"
+       gap="-1"
+       copies_to_360="true"
+       mirror_copies="false"
+       split_items="false"
+       link_styles="false" />
+    <inkscape:path-effect
+       effect="copy_rotate"
+       starting_point="0,0"
+       origin="250,250"
+       id="path-effect4"
+       is_visible="true"
+       lpeversion="1.2"
+       lpesatellites=""
+       method="fuse_paths"
+       num_copies="6"
+       starting_angle="0"
+       rotation_angle="60"
+       gap="-1"
+       copies_to_360="true"
+       mirror_copies="false"
+       split_items="false"
+       link_styles="false" />
+    <inkscape:path-effect
+       effect="mirror_symmetry"
+       start_point="-60.776862,344.68271"
+       end_point="26.047227,-147.72116"
+       center_point="-17.364818,98.480775"
+       id="path-effect3"
+       is_visible="true"
+       lpeversion="1.2"
+       lpesatellites="#path3"
+       mode="vertical"
+       discard_orig_path="false"
+       fuse_paths="false"
+       oposite_fuse="false"
+       split_items="false"
+       split_open="false"
+       link_styles="false" />
+    <inkscape:path-effect
+       effect="copy_rotate"
+       starting_point="0,0"
+       origin="250,250"
+       id="path-effect8-2"
+       is_visible="true"
+       lpeversion="1.2"
+       lpesatellites=""
+       method="fuse_paths"
+       num_copies="6"
+       starting_angle="0"
+       rotation_angle="60"
+       gap="-1"
+       copies_to_360="true"
+       mirror_copies="false"
+       split_items="false"
+       link_styles="false" />
+    <inkscape:path-effect
+       effect="copy_rotate"
+       starting_point="0,0"
+       origin="250,250"
+       id="path-effect4-5"
+       is_visible="true"
+       lpeversion="1.2"
+       lpesatellites=""
+       method="fuse_paths"
+       num_copies="6"
+       starting_angle="0"
+       rotation_angle="60"
+       gap="-1"
+       copies_to_360="true"
+       mirror_copies="false"
+       split_items="false"
+       link_styles="false" />
+  </defs>
+  <g
+     inkscape:label="Livello 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g1"
+       transform="matrix(1.8704478,0,0,1.8704478,-245.48428,-226.02855)">
+      <path
+         id="path5"
+         style="fill:#666666;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-dasharray:none;stroke-opacity:1"
+         d="m 275.60894,293.35505 37.80512,31.72307 c 8.43958,-7.07669 15.649,-15.49482 21.33985,-24.91406 l 0.97265,0.35352 -0.78906,-0.66211 c 0.27302,-0.45558 0.54269,-0.91286 0.80859,-1.37305 5.7583,-10.14515 9.69955,-21.21986 11.64063,-32.72265 L 302.71484,249.5 h -2.36345 l 46.37517,-16.87891 c -1.9088,-10.84719 -5.5944,-21.2995 -10.90625,-30.9375 l 0.79297,-0.66601 -0.9668,0.35156 c -0.25803,-0.46423 -0.51957,-0.92635 -0.78515,-1.38672 -5.90679,-10.05936 -13.52839,-19.00902 -22.51953,-26.4414 l -36.41797,30.55664 -1.17969,2.04492 8.56836,-48.59961 c -10.34835,-3.77053 -21.24342,-5.80464 -32.24609,-6.02344 l -0.17969,-1.01953 -0.17969,1.01367 c -0.53105,-0.009 -1.06227,-0.0135 -1.59375,-0.0137 -11.66506,0.0857 -23.226,2.21089 -34.1582,6.28125 l 8.2539,46.81641 1.18164,2.04687 -37.80468,-31.72266 c -8.43956,7.07668 -15.64902,15.49486 -21.33985,24.91407 l -0.97265,-0.35352 0.78906,0.66211 c -0.27302,0.45558 -0.54269,0.91286 -0.80859,1.37305 -5.75828,10.14512 -9.69956,21.21989 -11.64063,32.72265 L 197.28516,250.5 h 2.36328 l -46.375,16.87891 c 1.9088,10.84721 5.59439,21.29948 10.90625,30.9375 l -0.79297,0.66601 0.9668,-0.35156 c 0.25803,0.46423 0.51957,0.92635 0.78515,1.38672 5.9068,10.05938 13.52838,19.009 22.51953,26.4414 l 36.41797,-30.55664 1.17969,-2.04492 -8.56836,48.59961 c 10.34838,3.77054 21.24338,5.80464 32.24609,6.02344 l 0.17969,1.01953 0.17969,-1.01367 c 0.53105,0.009 1.06227,0.0135 1.59375,0.0137 11.66509,-0.0858 23.22596,-2.21088 34.1582,-6.28125 l -8.2539,-46.81641 z"
+         inkscape:path-effect="#path-effect8"
+         inkscape:original-d="m 249.97907,150.00016 a 100,100 0 0 0 -34.1576,6.2823 l 34.1576,193.71738 34.19946,-193.95716 a 100,100 0 0 0 -34.19946,-6.04252 z" />
+      <circle
+         style="fill:#cccccc;fill-rule:evenodd;stroke:#000000;stroke-width:0.330729;stroke-dasharray:none;stroke-opacity:1"
+         id="circle6"
+         cx="250"
+         cy="250"
+         r="40" />
+      <circle
+         style="fill:#666666;fill-rule:evenodd;stroke:#000000;stroke-width:0.234717;stroke-dasharray:none;stroke-opacity:1"
+         id="circle7"
+         cx="250"
+         cy="250"
+         r="30" />
+      <g
+         id="g8"
+         transform="matrix(0.49727196,0,0,0.49352032,205.68259,186.6197)"
+         style="stroke:#000000;stroke-width:5.62501;stroke-dasharray:none;stroke-opacity:1">
+        <path
+           id="path1"
+           style="fill:#666666;fill-rule:evenodd;stroke:#000000;stroke-width:5.62501;stroke-dasharray:none;stroke-opacity:1"
+           d="m 275.60894,293.35505 37.80512,31.72307 c 8.43958,-7.07669 15.649,-15.49482 21.33985,-24.91406 l 0.97265,0.35352 -0.78906,-0.66211 c 0.27302,-0.45558 0.54269,-0.91286 0.80859,-1.37305 5.7583,-10.14515 9.69955,-21.21986 11.64063,-32.72265 L 302.71484,249.5 h -2.36345 l 46.37517,-16.87891 c -1.9088,-10.84719 -5.5944,-21.2995 -10.90625,-30.9375 l 0.79297,-0.66601 -0.9668,0.35156 c -0.25803,-0.46423 -0.51957,-0.92635 -0.78515,-1.38672 -5.90679,-10.05936 -13.52839,-19.00902 -22.51953,-26.4414 l -36.41797,30.55664 -1.17969,2.04492 8.56836,-48.59961 c -10.34835,-3.77053 -21.24342,-5.80464 -32.24609,-6.02344 l -0.17969,-1.01953 -0.17969,1.01367 c -0.53105,-0.009 -1.06227,-0.0135 -1.59375,-0.0137 -11.66506,0.0857 -23.226,2.21089 -34.1582,6.28125 l 8.2539,46.81641 1.18164,2.04687 -37.80468,-31.72266 c -8.43956,7.07668 -15.64902,15.49486 -21.33985,24.91407 l -0.97265,-0.35352 0.78906,0.66211 c -0.27302,0.45558 -0.54269,0.91286 -0.80859,1.37305 -5.75828,10.14512 -9.69956,21.21989 -11.64063,32.72265 L 197.28516,250.5 h 2.36328 l -46.375,16.87891 c 1.9088,10.84721 5.59439,21.29948 10.90625,30.9375 l -0.79297,0.66601 0.9668,-0.35156 c 0.25803,0.46423 0.51957,0.92635 0.78515,1.38672 5.9068,10.05938 13.52838,19.009 22.51953,26.4414 l 36.41797,-30.55664 1.17969,-2.04492 -8.56836,48.59961 c 10.34838,3.77054 21.24338,5.80464 32.24609,6.02344 l 0.17969,1.01953 0.17969,-1.01367 c 0.53105,0.009 1.06227,0.0135 1.59375,0.0137 11.66509,-0.0858 23.22596,-2.21088 34.1582,-6.28125 l -8.2539,-46.81641 z"
+           inkscape:original-d="m 249.97907,150.00016 a 100,100 0 0 0 -34.1576,6.2823 l 34.1576,193.71738 34.19946,-193.95716 a 100,100 0 0 0 -34.19946,-6.04252 z"
+           inkscape:path-effect="#path-effect4" />
+        <circle
+           style="fill:#cccccc;fill-rule:evenodd;stroke:none;stroke-width:5.62501;stroke-dasharray:none;stroke-opacity:1"
+           id="path4"
+           cx="250"
+           cy="250"
+           r="40" />
+        <circle
+           style="fill:#666666;fill-rule:evenodd;stroke:none;stroke-width:5.62501;stroke-dasharray:none;stroke-opacity:1"
+           id="circle5"
+           cx="250"
+           cy="250"
+           r="30" />
+      </g>
+    </g>
+  </g>
+</svg>
