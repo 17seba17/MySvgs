@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My SVGs</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #1c1e21;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        .view {
+            display: none;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .view.active {
+            display: block;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            gap: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        nav button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #606770;
+            padding: 10px;
+            border-radius: 50%;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        nav button:hover {
+            color: #1877f2;
+            background-color: #e7f3ff;
+        }
+        nav button.active {
+            color: #1877f2;
+            background-color: #e7f3ff;
+            box-shadow: 0 0 0 4px rgba(24, 119, 242, 0.2);
+        }
+
+        .gallery-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding-top: 20px;
+        }
+
+        .svg-card {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .svg-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+        .svg-card .svg-container {
+            width: 100%;
+            max-width: 300px;
+            padding-top: 100%;
+            position: relative;
+            overflow: visible;
+            margin-bottom: 15px;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        .svg-card .svg-container svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            overflow: visible !important;
+        }
+        .svg-card h3 {
+            margin: 10px 0 5px 0;
+            color: #222;
+            font-size: 1.2em;
+            line-height: 1.3;
+        }
+        .svg-card .date {
+            font-style: italic;
+            font-size: 0.85em;
+            color: #777;
+            margin-bottom: 8px;
+        }
+        .svg-card .desc {
+            font-size: 0.95em;
+            color: #555;
+            text-align: center;
+            flex-grow: 1;
+            max-height: 4.5em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+
+        #home-view .slider {
+            width: 90%;
+            max-width: 500px;
+            margin: 20px auto 40px auto;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            background-color: #fff;
+        }
+        #home-view .slider #slider-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.7s ease-in-out, transform 0.7s ease-in-out;
+            overflow: visible;
+            padding: 10px;
+            box-sizing: border-box;
+            aspect-ratio: 1 / 1;
+        }
+        #home-view .slider #slider-content svg {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            overflow: visible !important;
+        }
+
+        .slide-out-left { opacity: 0; transform: translateX(-100%); }
+        .slide-out-right { opacity: 0; transform: translateX(100%); }
+        .slide-out-up { opacity: 0; transform: translateY(-100%); }
+        .slide-out-down { opacity: 0; transform: translateY(100%); }
+        
+        #gallery-view .search-bar {
+            display: block;
+            width: 80%;
+            max-width: 500px;
+            margin: 0 auto 30px auto;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        #gallery-view .search-bar:focus {
+            border-color: #1877f2;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.08), 0 0 0 3px rgba(24, 119, 242, 0.2);
+        }
+        #gallery-view .gallery-container {
+            min-height: 300px;
+        }
+
+        #calendar-view .calendar-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .flatpickr-day.has-creation {
+            position: relative;
+            font-weight: bold;
+            background-color: #e7f3ff;
+        }
+        .flatpickr-day.has-creation::after {
+            content: attr(data-count);
+            position: absolute;
+            bottom: 1px;
+            right: 1px;
+            background-color: #1877f2;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            line-height: 18px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .flatpickr-day.selected, .flatpickr-day.selected:hover {
+            background: #1877f2 !important;
+            color: white !important;
+            border-color: #1877f2 !important;
+        }
+        .flatpickr-months .flatpickr-month {
+            color: #1c1e21;
+        }
+        .flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
+            color: #1c1e21;
+        }
+
+        .day-scroller {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 10px 0;
+            background-color: #e9ebee;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+            display: none;
+        }
+        .day-scroller button {
+            display: inline-block;
+            padding: 8px 15px;
+            margin: 0 5px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            background-color: #fff;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s ease-in-out;
+            color: #333;
+        }
+        .day-scroller button:hover {
+            background-color: #f0f2f5;
+            border-color: #a0a0a0;
+        }
+        .day-scroller button.active {
+            background-color: #1877f2;
+            color: white;
+            border-color: #1877f2;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .view {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            h2 {
+                font-size: 1.4em;
+            }
+            nav {
+                padding: 8px;
+                gap: 10px;
+            }
+            nav button {
+                font-size: 20px;
+                padding: 8px;
+            }
+            .gallery-container {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 15px;
+            }
+            .svg-card .svg-container {
+                max-width: 250px;
+            }
+            #home-view .slider {
+                max-width: 350px;
+            }
+            .day-scroller button {
+                padding: 6px 12px;
+                font-size: 0.8em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .svg-card .svg-container {
+                max-width: 280px;
+            }
+            #home-view .slider {
+                width: 95%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Le mie Creazioni SVG</h1>
+
+    <nav>
+        <button id="nav-home" title="Homepage"><i class="fas fa-home"></i></button>
+        <button id="nav-gallery" title="Cerca"><i class="fas fa-search"></i></button>
+        <button id="nav-calendar" title="Calendario"><i class="fas fa-calendar-alt"></i></button>
+    </nav>
+
+    <main>
+        <!-- Questo div sarà usato per mostrare il messaggio di caricamento -->
+        <div id="loading-overlay" style="
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0.9); display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            z-index: 1000;
+        ">
+            <h2>Caricamento delle creazioni...</h2>
+            <p>Un momento per scaricare i tuoi SVG da GitHub.</p>
+        </div>
+
+        <section id="home-view" class="view">
+            <h2>Creazioni in evidenza</h2>
+            <div class="slider">
+                <div id="slider-content" class="svg-slide"></div>
+            </div>
+        </section>
+
+        <section id="gallery-view" class="view">
+            <input type="text" id="search-input" class="search-bar" placeholder="Cerca per titolo o descrizione...">
+            <div id="gallery-results" class="gallery-container"></div>
+        </section>
+
+        <section id="calendar-view" class="view">
+            <h2>Creazioni per Giorno</h2>
+            <div class="calendar-wrapper">
+                <div id="calendar-container"></div>
+            </div>
+            <div id="day-scroller-container" class="day-scroller"></div>
+            <div id="calendar-results" class="gallery-container"></div>
+        </section>
+    </main>
+
+    <script>
+        const GITHUB_USERNAME = '17seba17';
+        const GITHUB_REPO = 'MySvgs';
+        const GITHUB_BRANCH = 'main';
+        const SVGS_FOLDER = 'svgs';
+
+        const GITHUB_API_URL = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/${SVGS_FOLDER}?ref=${GITHUB_BRANCH}`;
+        const GITHUB_RAW_BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${GITHUB_REPO}/${GITHUB_BRANCH}/${SVGS_FOLDER}/`;
+
+        const allSvgData = [];
+        let sliderInterval;
+        let flatpickrInstance;
+        const creationCounts = {};
+        const sortedDatesWithCreations = [];
+
+        const views = document.querySelectorAll('.view');
+        const navButtons = document.querySelectorAll('nav button');
+        
+        const homeView = document.getElementById('home-view');
+        const sliderContent = document.getElementById('slider-content');
+        
+        const galleryView = document.getElementById('gallery-view');
+        let searchInput = document.getElementById('search-input');
+        let galleryResults = document.getElementById('gallery-results');
+
+        const calendarView = document.getElementById('calendar-view');
+        let calendarContainer = document.getElementById('calendar-container');
+        let calendarResults = document.getElementById('calendar-results');
+        let dayScrollerContainer = document.getElementById('day-scroller-container');
+
+        const loadingOverlay = document.getElementById('loading-overlay');
+
+        document.addEventListener('DOMContentLoaded', initialize);
+
+        async function initialize() {
+            loadingOverlay.style.display = 'flex'; // Mostra l'overlay di caricamento
+            await loadAllSvgData();
+            loadingOverlay.style.display = 'none'; // Nasconde l'overlay dopo il caricamento
+            
+            setupEventListeners();
+            initCalendar();
+            showView('home');
+        }
+        
+        function sanitizeSvgIds(svgMarkup) {
+            const uniqueSuffix = 'uid-' + Math.random().toString(36).substring(2, 9);
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(svgMarkup, "image/svg+xml");
+            const elementsWithId = svgDoc.querySelectorAll('[id]');
+            const idMap = new Map();
+
+            elementsWithId.forEach(element => {
+                const oldId = element.id;
+                const newId = `${oldId}-${uniqueSuffix}`;
+                idMap.set(oldId, newId);
+                element.id = newId;
+            });
+
+            let updatedSvgString = new XMLSerializer().serializeToString(svgDoc);
+            
+            // Aggiorna i riferimenti url(#id)
+            updatedSvgString = updatedSvgString.replace(/url\s*\(\s*#([^)]+)\s*\)/g, (match, oldId) => {
+                return idMap.has(oldId) ? `url(#${idMap.get(oldId)})` : match;
+            });
+            // Aggiorna i riferimenti href="#id"
+            updatedSvgString = updatedSvgString.replace(/href\s*=\s*"\s*#([^"]+)\s*"/g, (match, oldId) => {
+                return idMap.has(oldId) ? `href="#${idMap.get(oldId)}"` : match;
+            });
+            // Aggiorna i riferimenti xlink:href="#id"
+            updatedSvgString = updatedSvgString.replace(/xlink:href\s*=\s*"\s*#([^"]+)\s*"/g, (match, oldId) => {
+                return idMap.has(oldId) ? `xlink:href="#${idMap.get(oldId)}"` : match;
+            });
+
+            return updatedSvgString;
+        }
+
+        async function loadSvgFileNames() {
+            try {
+                const response = await fetch(GITHUB_API_URL);
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        throw new Error("API Rate Limit Exceeded or Authentication Required. Try again later.");
+                    }
+                    throw new Error(`Failed to load file list: ${response.statusText}`);
+                }
+                const data = await response.json();
+                return data
+                    .filter(item => item.type === 'file' && item.name.endsWith('.svg'))
+                    .map(item => item.name);
+            } catch (error) {
+                console.error("Error fetching SVG file list from GitHub API:", error);
+                loadingOverlay.innerHTML = `<h2>Error loading creations!</h2><p>Could not fetch SVG list. Message: ${error.message}</p>`;
+                return [];
+            }
+        }
+
+        async function loadAllSvgData() {
+            const fileNames = await loadSvgFileNames();
+            if (fileNames.length === 0) {
+                loadingOverlay.innerHTML = `<h2>No SVG creations found.</h2><p>Check the console for details, or ensure your 'svgs' folder is correct.</p>`;
+                return;
+            }
+
+            const promises = fileNames.map(async (fileName) => {
+                const fileUrl = GITHUB_RAW_BASE_URL + fileName;
+                try {
+                    const response = await fetch(fileUrl);
+                    if (!response.ok) return null;
+                    const svgText = await response.text();
+
+                    const parser = new DOMParser();
+                    const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+                    const svgElement = svgDoc.documentElement;
+
+                    const dateString = svgElement.dataset.date;
+                    if (!dateString) {
+                        console.warn(`SVG ${fileName} is missing 'data-date'. Skipping.`);
+                        return null;
+                    }
+
+                    const [day, month, year] = dateString.split('-').map(Number);
+                    const dateObject = new Date(year, month - 1, day);
+                    const isoDate = dateObject.toISOString().split('T')[0];
+                    
+                    creationCounts[isoDate] = (creationCounts[isoDate] || 0) + 1;
+
+                    return {
+                        title: svgElement.dataset.title || 'Untitled',
+                        description: svgElement.dataset.description || '',
+                        dateString: dateString,
+                        dateObject: dateObject,
+                        isoDate: isoDate,
+                        originalSvgMarkup: svgText
+                    };
+                } catch (error) {
+                    console.error(`Error loading or parsing ${fileName}:`, error);
+                    return null;
+                }
+            });
+
+            const results = await Promise.all(promises);
+            allSvgData.push(...results.filter(Boolean));
+            allSvgData.sort((a, b) => b.dateObject - a.dateObject);
+            
+            const uniqueDates = [...new Set(allSvgData.map(d => d.isoDate))];
+            uniqueDates.sort().forEach(d => sortedDatesWithCreations.push(d));
+        }
+
+        function showView(viewId) {
+            clearInterval(sliderInterval);
+
+            views.forEach(view => view.classList.remove('active'));
+            document.getElementById(`${viewId}-view`).classList.add('active');
+
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`nav-${viewId}`).classList.add('active');
+
+            if (viewId === 'home') {
+                startSlider();
+            } else if (viewId === 'gallery') {
+                renderGallery(allSvgData, galleryResults);
+            }
+        }
+        
+        function setupEventListeners() {
+            document.getElementById('nav-home').addEventListener('click', () => showView('home'));
+            document.getElementById('nav-gallery').addEventListener('click', () => showView('gallery'));
+            document.getElementById('nav-calendar').addEventListener('click', () => showView('calendar'));
+            searchInput.addEventListener('input', handleSearch);
+        }
+
+        function renderGallery(data, container) {
+            container.innerHTML = '';
+            if (data.length === 0) {
+                container.innerHTML = '<p>No creations found.</p>';
+                return;
+            }
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'svg-card';
+                card.innerHTML = `
+                    <div class="svg-container"></div>
+                    <h3>${item.title}</h3>
+                    <p class="date">${item.dateString}</p>
+                    <p class="desc">${item.description}</p>
+                `;
+                const svgContainer = card.querySelector('.svg-container');
+                svgContainer.innerHTML = sanitizeSvgIds(item.originalSvgMarkup);
+                container.appendChild(card);
+            });
+        }
+
+        function startSlider() {
+            if (allSvgData.length === 0) return;
+            showRandomSvg();
+            sliderInterval = setInterval(showRandomSvg, 10000);
+        }
+
+        function showRandomSvg() {
+            if (allSvgData.length === 0) {
+                sliderContent.innerHTML = '<p>No SVG to display.</p>';
+                return;
+            }
+            const animations = ['slide-out-left', 'slide-out-right', 'slide-out-up', 'slide-out-down'];
+            const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
+            
+            sliderContent.classList.add(randomAnimation);
+
+            setTimeout(() => {
+                const randomIndex = Math.floor(Math.random() * allSvgData.length);
+                const randomItem = allSvgData[randomIndex];
+                
+                sliderContent.innerHTML = sanitizeSvgIds(randomItem.originalSvgMarkup);
+                sliderContent.classList.remove(randomAnimation);
+            }, 700);
+        }
+
+        function handleSearch() {
+            const query = searchInput.value.toLowerCase().trim();
+            if (query === '') {
+                renderGallery(allSvgData, galleryResults);
+                return;
+            }
+            const filteredData = allSvgData.filter(item => 
+                item.title.toLowerCase().includes(query) ||
+                item.description.toLowerCase().includes(query)
+            );
+            renderGallery(filteredData, galleryResults);
+        }
+
+        function initCalendar() {
+            flatpickrInstance = flatpickr(calendarContainer, {
+                inline: true,
+                onDayCreate: function(dObj, dStr, fp, dayElem) {
+                    const date = dayElem.dateObj.toISOString().split('T')[0];
+                    if (creationCounts[date]) {
+                        dayElem.classList.add('has-creation');
+                        dayElem.dataset.count = creationCounts[date];
+                    }
+                },
+                onChange: function(selectedDates, dateStr, instance) {
+                    if (selectedDates.length > 0) {
+                        const selectedIsoDate = selectedDates[0].toISOString().split('T')[0];
+                        filterByDate(selectedIsoDate);
+                        renderDayScroller(selectedIsoDate);
+                        dayScrollerContainer.style.display = 'block';
+                    }
+                }
+            });
+        }
+
+        function filterByDate(isoDate) {
+            const filteredData = allSvgData.filter(item => item.isoDate === isoDate);
+            renderGallery(filteredData, calendarResults);
+            
+            document.querySelectorAll('.day-scroller button').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.date === isoDate);
+            });
+        }
+        
+        function renderDayScroller(activeDate) {
+            dayScrollerContainer.innerHTML = '';
+            sortedDatesWithCreations.forEach(isoDate => {
+                const btn = document.createElement('button');
+                const [year, month, day] = isoDate.split('-');
+                btn.textContent = `${day}/${month}`;
+                btn.dataset.date = isoDate;
+                if (isoDate === activeDate) {
+                    btn.classList.add('active');
+                }
+                btn.addEventListener('click', () => {
+                    filterByDate(isoDate);
+                    btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                });
+                dayScrollerContainer.appendChild(btn);
+            });
+            setTimeout(() => {
+                const activeButton = dayScrollerContainer.querySelector('button.active');
+                if (activeButton) {
+                    activeButton.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
+            }, 100);
+        }
+    </script>
+</body>
+</html>
