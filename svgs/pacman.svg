@@ -2,9 +2,7 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   data-date="23-07-2025"
-   data-title="pacman hippy"
-   data-description="la mia prima creazione: ho seguito un tutorial veloce per realizzarlo"
+   
    width="500mm"
    height="500mm"
    viewBox="0 0 500 500"
@@ -678,4 +676,15 @@
          transform="matrix(0.90326427,0.42908467,-0.26389927,0.96455024,0,0)" />
     </g>
   </g>
+  <metadata
+     id="metadata2">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Pacman hippyo</dc:title>
+        <dc:date>23-07-2025</dc:date>
+        <dc:description>La mia prima creazione: ho seguito un tutorial veloce per realizzarlo</dc:description>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
 </svg>
