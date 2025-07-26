@@ -459,58 +459,62 @@
             }
         }
 
-        async function loadAllSvgData() {
-            const fileNames = await loadSvgFileNames();
-            if (fileNames.length === 0) {
-                loadingOverlay.innerHTML = `<h2>No SVG creations found.</h2><p>Check the console for details, or ensure your 'svgs' folder is correct.</p>`;
-                return;
+       async function loadAllSvgData() {
+    const fileNames = await loadSvgFileNames();
+    if (fileNames.length === 0) {
+        loadingOverlay.innerHTML = `<h2>No SVG creations found.</h2><p>Check the console for details, or ensure your 'svgs' folder is correct.</p>`;
+        return;
+    }
+
+    const promises = fileNames.map(async (fileName) => {
+        const fileUrl = GITHUB_RAW_BASE_URL + fileName;
+        try {
+            const response = await fetch(fileUrl);
+            if (!response.ok) return null;
+            const svgText = await response.text();
+
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+            const titleElement = svgDoc.querySelector('metadata cc\\:Work dc\\:title');
+            const descriptionElement = svgDoc.querySelector('metadata cc\\:Work dc\\:description');
+            const dateElement = svgDoc.querySelector('metadata cc\\:Work dc\\:date');
+            
+            const dateString = dateElement?.textContent;
+
+            if (!dateString) {
+                console.warn(`SVG ${fileName} is missing '<dc:date>' in metadata. Skipping.`);
+                return null;
             }
 
-            const promises = fileNames.map(async (fileName) => {
-                const fileUrl = GITHUB_RAW_BASE_URL + fileName;
-                try {
-                    const response = await fetch(fileUrl);
-                    if (!response.ok) return null;
-                    const svgText = await response.text();
-
-                    const parser = new DOMParser();
-                    const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-                    const svgElement = svgDoc.documentElement;
-
-                    const dateString = svgElement.dataset.date;
-                    if (!dateString) {
-                        console.warn(`SVG ${fileName} is missing 'data-date'. Skipping.`);
-                        return null;
-                    }
-
-                    const [day, month, year] = dateString.split('-').map(Number);
-                    const dateObject = new Date(year, month - 1, day);
-                    const isoDate = dateObject.toISOString().split('T')[0];
-                    
-                    creationCounts[isoDate] = (creationCounts[isoDate] || 0) + 1;
-
-                    return {
-                        title: svgElement.dataset.title || 'Untitled',
-                        description: svgElement.dataset.description || '',
-                        dateString: dateString,
-                        dateObject: dateObject,
-                        isoDate: isoDate,
-                        originalSvgMarkup: svgText
-                    };
-                } catch (error) {
-                    console.error(`Error loading or parsing ${fileName}:`, error);
-                    return null;
-                }
-            });
-
-            const results = await Promise.all(promises);
-            allSvgData.push(...results.filter(Boolean));
-            allSvgData.sort((a, b) => b.dateObject - a.dateObject);
+            const [day, month, year] = dateString.split('-').map(Number);
+            const dateObject = new Date(year, month - 1, day);
+            const isoDate = dateObject.toISOString().split('T')[0];
             
-            const uniqueDates = [...new Set(allSvgData.map(d => d.isoDate))];
-            uniqueDates.sort().forEach(d => sortedDatesWithCreations.push(d));
-        }
+            creationCounts[isoDate] = (creationCounts[isoDate] || 0) + 1;
 
+            return {
+                title: titleElement?.textContent || 'Untitled',
+                description: descriptionElement?.textContent || '',
+                dateString: dateString,
+                dateObject: dateObject,
+                isoDate: isoDate,
+                originalSvgMarkup: svgText
+            };
+            
+
+        } catch (error) {
+            console.error(`Error loading or parsing ${fileName}:`, error);
+            return null;
+        }
+    });
+
+    const results = await Promise.all(promises);
+    allSvgData.push(...results.filter(Boolean));
+    allSvgData.sort((a, b) => b.dateObject - a.dateObject);
+    
+    const uniqueDates = [...new Set(allSvgData.map(d => d.isoDate))];
+    uniqueDates.sort().forEach(d => sortedDatesWithCreations.push(d));
+}
         function showView(viewId) {
             clearInterval(sliderInterval);
 
