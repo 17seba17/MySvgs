@@ -459,10 +459,10 @@
             }
         }
 
-       async function loadAllSvgData() {
+   async function loadAllSvgData() {
     const fileNames = await loadSvgFileNames();
     if (fileNames.length === 0) {
-        loadingOverlay.innerHTML = `<h2>No SVG creations found.</h2><p>Check the console for details, or ensure your 'svgs' folder is correct.</p>`;
+        loadingOverlay.innerHTML = `<h2>Nessuna creazione SVG trovata.</h2><p>Controlla la console per i dettagli o assicurati che la cartella 'svgs' sia corretta.</p>`;
         return;
     }
 
@@ -474,15 +474,32 @@
             const svgText = await response.text();
 
             const parser = new DOMParser();
-            const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-            const titleElement = svgDoc.querySelector('metadata cc\\:Work dc\\:title');
-            const descriptionElement = svgDoc.querySelector('metadata cc\\:Work dc\\:description');
-            const dateElement = svgDoc.querySelector('metadata cc\\:Work dc\\:date');
+            // Usiamo "application/xml" per un parsing dei metadati più affidabile
+            const svgDoc = parser.parseFromString(svgText, "application/xml");
             
-            const dateString = dateElement?.textContent;
+            // --- INIZIO LOGICA CORRETTA ---
+
+            // Definiamo il namespace corretto per gli elementi 'dc' (Dublin Core)
+            const dcNamespace = 'http://purl.org/dc/elements/1.1/';
+
+            // Funzione di supporto per estrarre il contenuto testuale in modo sicuro
+            const getTextContentByNS = (parentElement, tagName) => {
+                const elements = parentElement.getElementsByTagNameNS(dcNamespace, tagName);
+                return elements.length > 0 ? elements[0].textContent : null;
+            };
+
+            const title = getTextContentByNS(svgDoc, 'title');
+            const description = getTextContentByNS(svgDoc, 'description');
+            const dateString = getTextContentByNS(svgDoc, 'date');
+            
+            // --- FINE LOGICA CORRETTA ---
 
             if (!dateString) {
-                console.warn(`SVG ${fileName} is missing '<dc:date>' in metadata. Skipping.`);
+                console.warn(`SVG ${fileName} non contiene '<dc:date>' nei metadati. File saltato.`);
+                // Aggiungiamo un controllo per errori di parsing
+                if (svgDoc.getElementsByTagName('parsererror').length > 0) {
+                     console.error(`Errore di parsing in ${fileName}:`, svgDoc.getElementsByTagName('parsererror')[0].textContent);
+                }
                 return null;
             }
 
@@ -493,17 +510,16 @@
             creationCounts[isoDate] = (creationCounts[isoDate] || 0) + 1;
 
             return {
-                title: titleElement?.textContent || 'Untitled',
-                description: descriptionElement?.textContent || '',
+                title: title || 'Untitled',
+                description: description || '',
                 dateString: dateString,
                 dateObject: dateObject,
                 isoDate: isoDate,
                 originalSvgMarkup: svgText
             };
-            
 
         } catch (error) {
-            console.error(`Error loading or parsing ${fileName}:`, error);
+            console.error(`Errore durante il caricamento o il parsing di ${fileName}:`, error);
             return null;
         }
     });
