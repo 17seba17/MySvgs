@@ -2,9 +2,6 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   data-date="24-07-2025"
-   data-title="Icona delle impostazioni"
-   data-description="La mia seconda creazione"
    width="500mm"
    height="500mm"
    viewBox="0 0 500 500"
@@ -15,7 +12,12 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title1">Icona delle impostazioni</title>
   <sodipodi:namedview
      id="namedview1"
      pagecolor="#ffffff"
@@ -27,8 +29,8 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="0.20168158"
-     inkscape:cx="414.01897"
-     inkscape:cy="954.47487"
+     inkscape:cx="416.49813"
+     inkscape:cy="949.51656"
      inkscape:window-width="1920"
      inkscape:window-height="991"
      inkscape:window-x="-9"
@@ -172,4 +174,15 @@
       </g>
     </g>
   </g>
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Icona delle impostazioni</dc:title>
+        <dc:date>24-07-2025</dc:date>
+        <dc:description>La mia seconda creazione</dc:description>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
 </svg>
