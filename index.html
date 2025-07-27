@@ -9,8 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <style>
-        /* Stili Esistenti (con una piccola aggiunta) */
+      <style>
         body {
             font-family: -apple-system, BlinkMacMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
@@ -18,8 +17,7 @@
             color: #333;
             line-height: 1.6;
         }
-        /* ... tutti gli altri stili esistenti rimangono invariati ... */
-        .svg-card.interactive-card { /* NUOVO: Cursore per indicare interattività */
+        .svg-card.interactive-card {
             cursor: pointer;
         }
         
@@ -96,24 +94,27 @@
             transform: translateY(-5px);
             box-shadow: 0 6px 15px rgba(0,0,0,0.15);
         }
-        .svg-card .svg-container {
-            width: 100%;
-            max-width: 300px;
-            padding-top: 100%;
-            position: relative;
-            overflow: hidden; 
-            margin-bottom: 15px;
-            border: 1px solid #f0f0f0;
-            border-radius: 8px;
-            box-sizing: border-box;
-        }
-        .svg-card .svg-container svg {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
+
+.svg-card .svg-container {
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 1 / 1;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 15px;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+ .svg-card .svg-container svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+        /* ------------------------------------ */
+
         .svg-card h3 {
             margin: 10px 0 5px 0;
             color: #222;
@@ -276,13 +277,12 @@
             font-weight: bold;
         }
         
-        /* NUOVO: Stili per il modale SVG */
         #svg-modal {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
             background-color: rgba(30, 30, 30, 0.9);
-            display: none; /* Inizialmente nascosto */
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 2000;
@@ -291,20 +291,22 @@
         }
         #svg-modal-content {
             position: relative;
+             transform-origin: 0 0; 
             width: 100%;
             height: 100%;
-            max-width: 90vw;
-            max-height: 90vh;
-            overflow: hidden; /* Nasconde ciò che esce dall'area di zoom */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: white;
+            max-width: min(90vw,90vh);
+            max-height:  min(90vw,90vh);
+            overflow: hidden;
+            background-color: rgba(0,0,0,0);
             border-radius: 10px;
+            
         }
         #svg-modal-zoom-container {
             cursor: grab;
             transform-origin: 0 0;
+            position: absolute;
+            top: 0;
+            left: 0;
             transition: transform 0.2s ease-out;
         }
         #svg-modal-zoom-container:active {
@@ -363,57 +365,25 @@
             background: #f0f0f0;
         }
 
-
         @media (max-width: 768px) {
             .view {
                 padding: 10px;
             }
-            h1 {
-                font-size: 1.8em;
-            }
-            h2 {
-                font-size: 1.4em;
-            }
-            nav {
-                padding: 8px;
-                gap: 10px;
-            }
-            nav button {
-                font-size: 20px;
-                padding: 8px;
-            }
-            .gallery-container {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                gap: 15px;
-            }
-            .svg-card .svg-container {
-                max-width: 250px;
-            }
-            #home-view .slider {
-                max-width: 350px;
-            }
-            .day-scroller button {
-                padding: 6px 12px;
-                font-size: 0.8em;
-            }
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.4em; }
+            nav { padding: 8px; gap: 10px; }
+            nav button { font-size: 20px; padding: 8px; }
+            .gallery-container { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+            .svg-card .svg-container { max-width: 250px; }
+            #home-view .slider { max-width: 350px; }
+            .day-scroller button { padding: 6px 12px; font-size: 0.8em; }
         }
 
         @media (max-width: 480px) {
-            .gallery-container {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            .svg-card .svg-container {
-                max-width: 280px;
-            }
-            #home-view .slider {
-                width: 95%;
-                max-width: 300px;
-            }
-            #svg-modal-content {
-                max-width: 95vw;
-                max-height: 85vh;
-            }
+            .gallery-container { grid-template-columns: 1fr; gap: 15px; }
+            .svg-card .svg-container { max-width: 280px; }
+            #home-view .slider { width: 95%; max-width: 300px; }
+            #svg-modal-content { max-width: 95vw; max-height: 85vh; }
         }
     </style>
 </head>
@@ -470,6 +440,7 @@
         </div>
         <div class="svg-modal-controls">
             <button id="zoom-in-btn" title="Ingrandisci">+</button>
+              <button id="center-image-btn" title="Centra">0</button>
             <button id="zoom-out-btn" title="Rimpicciolisci">-</button>
         </div>
     </div>
@@ -511,6 +482,7 @@
         const svgModalZoomContainer = document.getElementById('svg-modal-zoom-container');
         const closeModalBtn = document.getElementById('svg-modal-close-btn');
         const zoomInBtn = document.getElementById('zoom-in-btn');
+                const centerImageBtn = document.getElementById('center-image-btn');
         const zoomOutBtn = document.getElementById('zoom-out-btn');
         
         // --- MODIFICATO: Stato del modale per supportare touch e pinch ---
@@ -675,138 +647,164 @@
             const filtered = allSvgData.filter(item => item.title.toLowerCase().includes(query) || item.description.toLowerCase().includes(query));
             renderGallery(query ? filtered : allSvgData, galleryResults);
         }
-   
-        // --- LOGICA MODALE ---
-        function resetModalState() {
-            modalState.scale = 1;
+        
+        
+// --- LOGICA MODALE ---
+// Funzioni di base invariate (reset, open, close, updateTransform, getDistance)
+
+function resetModalState() {
+    modalState.scale = 1;
+    modalState.panning = false;
+    modalState.pointX = 0;
+    modalState.pointY = 0;
+    modalState.start = { x: 0, y: 0 };
+    modalState.initialPinchDistance = 0;
+    modalState.startScale = 1;
+    updateTransform();
+}
+function openSvgModal(svgMarkup) {
+    document.body.style.overflow = 'hidden';
+    resetModalState();
+    svgModalZoomContainer.innerHTML = sanitizeSvgIds(svgMarkup);
+    svgModal.style.display = 'flex';
+}
+function closeSvgModal() {
+  resetModalState();
+    svgModal.style.display = 'none';
+    svgModalZoomContainer.innerHTML = '';
+    document.body.style.overflow = '';
+}
+function updateTransform() {
+    // Assicurati che l'origine della trasformazione sia in alto a sinistra nel CSS
+    // svgModalZoomContainer { transform-origin: 0 0; }
+    svgModalZoomContainer.style.transform = `translate(${modalState.pointX}px, ${modalState.pointY}px) scale(${modalState.scale})`;
+}
+function getDistance(p1, p2) {
+    const dx = p1.clientX - p2.clientX;
+    const dy = p1.clientY - p2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+
+
+// --- MODIFICATO E RESO PIÙ ROBUSTO ---
+function zoomAtPoint(requestedScale, point) {
+    const oldScale = modalState.scale;
+    
+    // Applica i limiti di zoom. Puoi modificare questi valori in sicurezza.
+    const newScale = Math.min(Math.max(0.25, requestedScale), 500);
+
+    // Se la scala è già a un limite e stiamo cercando di andare oltre, non fare nulla.
+    // Questo previene "salti" o bug ai limiti dello zoom.
+    if (newScale === oldScale) {
+        return;
+    }
+    
+    // La formula matematica per lo zoom verso un punto rimane corretta
+    modalState.pointX = point.x - ((point.x - modalState.pointX) / oldScale) * newScale;
+    modalState.pointY = point.y - ((point.y - modalState.pointY) / oldScale) * newScale;
+    
+    modalState.scale = newScale;
+    
+    updateTransform();
+}
+
+// --- SETUP LISTENERS (INVARIATO, MA ORA SI BASA SU UNA LOGICA PIÙ SOLIDA) ---
+function setupModalListeners() {
+    closeModalBtn.addEventListener('click', closeSvgModal);
+    svgModal.addEventListener('click', (e) => { if (e.target === svgModal) closeSvgModal(); });
+
+    // Pulsanti zoom (usano la logica moltiplicativa corretta)
+    zoomInBtn.addEventListener('click', () => {
+        const rect = svgModalContent.getBoundingClientRect();
+        const centerPoint = { x: rect.width / 2, y: rect.height / 2 };
+        zoomAtPoint(modalState.scale * 1.25, centerPoint);
+    });
+
+    zoomOutBtn.addEventListener('click', () => {
+        const rect = svgModalContent.getBoundingClientRect();
+        const centerPoint = { x: rect.width / 2, y: rect.height / 2 };
+        zoomAtPoint(modalState.scale / 1.25, centerPoint);
+    });
+        centerImageBtn.addEventListener('click', () => {
+               svgModalZoomContainer.style.transform = `translate(0px, 0px) scale(1)`;
+
+      
+    });
+
+    // Gestore 'wheel' (usa la logica moltiplicativa corretta)
+    svgModalContent.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const rect = svgModalContent.getBoundingClientRect();
+        // Le coordinate del mouse sono calcolate rispetto al contenitore.
+        // Assicurati che il tuo CSS allinei il contenuto zoomabile in alto a sinistra di questo contenitore!
+        const mousePoint = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        
+        const zoomFactor = 1.1; 
+        const newScale = e.deltaY < 0 ? modalState.scale * zoomFactor : modalState.scale / zoomFactor;
+
+        zoomAtPoint(newScale, mousePoint);
+    });
+
+    // Gestione Pan e Touch (invariata, ora beneficia della robustezza di zoomAtPoint)
+    svgModalContent.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        modalState.panning = true;
+        modalState.start.x = e.clientX - modalState.pointX;
+        modalState.start.y = e.clientY - modalState.pointY;
+        svgModalContent.style.cursor = 'grabbing';
+    });
+    window.addEventListener('mouseup', () => { 
+        modalState.panning = false; 
+        svgModalContent.style.cursor = 'grab';
+    });
+    window.addEventListener('mousemove', (e) => {
+        if (!modalState.panning) return;
+        e.preventDefault();
+        modalState.pointX = e.clientX - modalState.start.x;
+        modalState.pointY = e.clientY - modalState.start.y;
+        updateTransform();
+    });
+
+    // Touch events
+    svgModalContent.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touches = e.touches;
+        if (touches.length === 1) {
+            modalState.panning = true;
+            modalState.start.x = touches[0].clientX - modalState.pointX;
+            modalState.start.y = touches[0].clientY - modalState.pointY;
+        } else if (touches.length === 2) {
             modalState.panning = false;
-            modalState.pointX = 0;
-            modalState.pointY = 0;
-            modalState.start = { x: 0, y: 0 };
-            modalState.initialPinchDistance = 0;
-            modalState.startScale = 1;
+            modalState.initialPinchDistance = getDistance(touches[0], touches[1]);
+            modalState.startScale = modalState.scale;
+            const rect = svgModalContent.getBoundingClientRect();
+            modalState.pinchCenter = {
+                x: ((touches[0].clientX + touches[1].clientX) / 2) - rect.left,
+                y: ((touches[0].clientY + touches[1].clientY) / 2) - rect.top
+            };
+        }
+    });
+    svgModalContent.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const touches = e.touches;
+        if (touches.length === 1 && modalState.panning) {
+            modalState.pointX = touches[0].clientX - modalState.start.x;
+            modalState.pointY = touches[0].clientY - modalState.start.y;
             updateTransform();
+        } else if (touches.length === 2 && modalState.initialPinchDistance > 0) {
+            const newDist = getDistance(touches[0], touches[1]);
+            const scaleRatio = newDist / modalState.initialPinchDistance;
+            const newScale = modalState.startScale * scaleRatio;
+            zoomAtPoint(newScale, modalState.pinchCenter);
         }
-        function openSvgModal(svgMarkup) {
-            document.body.style.overflow = 'hidden';
-            resetModalState();
-            svgModalZoomContainer.innerHTML = sanitizeSvgIds(svgMarkup);
-            svgModal.style.display = 'flex';
-        }
-        function closeSvgModal() {
-            svgModal.style.display = 'none';
-            svgModalZoomContainer.innerHTML = '';
-            document.body.style.overflow = '';
-        }
-        function updateTransform() {
-            svgModalZoomContainer.style.transform = `translate(${modalState.pointX}px, ${modalState.pointY}px) scale(${modalState.scale})`;
-        }
-        function getDistance(p1, p2) {
-            const dx = p1.clientX - p2.clientX;
-            const dy = p1.clientY - p2.clientY;
-            return Math.sqrt(dx * dx + dy * dy);
-        }
-        
-          function zoomAtPoint(newScale, point) {
-            const oldScale = modalState.scale;
-            
-            // Applica i limiti di zoom
-            newScale = Math.min(Math.max(0.1, newScale), 20);
-
-            // La formula per calcolare il nuovo offset di traslazione
-            modalState.pointX = point.x - ((point.x - modalState.pointX) / oldScale) * newScale;
-            modalState.pointY = point.y - ((point.y - modalState.pointY) / oldScale) * newScale;
-            
-            // Aggiorna la scala
-            modalState.scale = newScale;
-            
-            updateTransform();
-        }
-        
-             function setupModalListeners() {
-            closeModalBtn.addEventListener('click', closeSvgModal);
-            svgModal.addEventListener('click', (e) => { if (e.target === svgModal) closeSvgModal(); });
-
-            // --- MODIFICATO: Pulsanti zoom che zoomano verso il centro della vista ---
-            zoomInBtn.addEventListener('click', () => {
-                const rect = svgModalContent.getBoundingClientRect();
-                const centerPoint = { x: rect.width / 2, y: rect.height / 2 };
-                zoomAtPoint(modalState.scale * 1.2, centerPoint);
-            });
-
-            zoomOutBtn.addEventListener('click', () => {
-                const rect = svgModalContent.getBoundingClientRect();
-                const centerPoint = { x: rect.width / 2, y: rect.height / 2 };
-                zoomAtPoint(modalState.scale / 1.2, centerPoint);
-            });
-
-            // --- MODIFICATO: Gestore 'wheel' che usa la funzione helper ---
-            svgModalContent.addEventListener('wheel', (e) => {
-                e.preventDefault();
-                const rect = svgModalContent.getBoundingClientRect();
-                const mousePoint = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-                const delta = e.deltaY > 0 ? -0.2 : 0.2;
-                zoomAtPoint(modalState.scale + delta, mousePoint);
-            });
-
-            // Gestione pan (drag) con mouse (invariato)
-            svgModalContent.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                modalState.panning = true;
-                modalState.start.x = e.clientX - modalState.pointX;
-                modalState.start.y = e.clientY - modalState.pointY;
-            });
-            window.addEventListener('mouseup', () => { modalState.panning = false; });
-            window.addEventListener('mousemove', (e) => {
-                if (!modalState.panning) return;
-                e.preventDefault();
-                modalState.pointX = e.clientX - modalState.start.x;
-                modalState.pointY = e.clientY - modalState.start.y;
-                updateTransform();
-            });
-
-            // Gestione eventi touch (invariato nella logica, ma ora usa la funzione helper)
-            svgModalContent.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                const touches = e.touches;
-                if (touches.length === 1) {
-                    modalState.panning = true;
-                    modalState.start.x = touches[0].clientX - modalState.pointX;
-                    modalState.start.y = touches[0].clientY - modalState.pointY;
-                } else if (touches.length === 2) {
-                    modalState.panning = false;
-                    modalState.initialPinchDistance = getDistance(touches[0], touches[1]);
-                    modalState.startScale = modalState.scale;
-                    const rect = svgModalContent.getBoundingClientRect();
-                    modalState.pinchCenter = {
-                        x: ((touches[0].clientX + touches[1].clientX) / 2) - rect.left,
-                        y: ((touches[0].clientY + touches[1].clientY) / 2) - rect.top
-                    };
-                }
-            });
-
-            svgModalContent.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                const touches = e.touches;
-                if (touches.length === 1 && modalState.panning) {
-                    modalState.pointX = touches[0].clientX - modalState.start.x;
-                    modalState.pointY = touches[0].clientY - modalState.start.y;
-                    updateTransform();
-                } else if (touches.length === 2 && modalState.initialPinchDistance > 0) {
-                    const newDist = getDistance(touches[0], touches[1]);
-                    const scaleRatio = newDist / modalState.initialPinchDistance;
-                    const newScale = modalState.startScale * scaleRatio;
-                    // Usa la funzione helper con il pinchCenter
-                    zoomAtPoint(newScale, modalState.pinchCenter);
-                }
-            });
-
-            svgModalContent.addEventListener('touchend', (e) => {
-                if (e.touches.length < 2) modalState.initialPinchDistance = 0;
-                if (e.touches.length < 1) modalState.panning = false;
-            });
-        }
-        
+    });
+    svgModalContent.addEventListener('touchend', (e) => {
+        if (e.touches.length < 2) modalState.initialPinchDistance = 0;
+        if (e.touches.length < 1) modalState.panning = false;
+    });
+}
+     ////calendario   
         function initCalendar() {
             flatpickrInstance = flatpickr(calendarContainer, {
                 inline: true,
