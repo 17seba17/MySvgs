@@ -2,9 +2,6 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   data-date="25-07-2025"
-   data-title="cervello"
-   data-description="il nostro cervello ci permette di fare ragionamenti logici"
    width="500mm"
    height="500mm"
    viewBox="0 0 500 500"
@@ -16,7 +13,12 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title1">Cervello</title>
   <sodipodi:namedview
      id="namedview1"
      pagecolor="#ffffff"
@@ -30,7 +32,7 @@
      showguides="true"
      inkscape:zoom="0.17705703"
      inkscape:cx="-406.64864"
-     inkscape:cy="-48.007131"
+     inkscape:cy="-53.655029"
      inkscape:window-width="1920"
      inkscape:window-height="991"
      inkscape:window-x="-9"
@@ -407,4 +409,15 @@
          id="path71" />
     </g>
   </g>
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Cervello</dc:title>
+        <dc:date>25-07-2025</dc:date>
+        <dc:description>Il nostro cervello ci permette di fare ragionamenti logici</dc:description>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
 </svg>
