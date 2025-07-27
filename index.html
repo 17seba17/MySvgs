@@ -95,7 +95,7 @@
             max-width: 300px;
             padding-top: 100%;
             position: relative;
-            overflow: visible;
+            overflow: hidden; 
             margin-bottom: 15px;
             border: 1px solid #f0f0f0;
             border-radius: 8px;
@@ -107,7 +107,6 @@
             width: 100%;
             height: 100%;
             display: block;
-            overflow: visible !important;
         }
         .svg-card h3 {
             margin: 10px 0 5px 0;
@@ -152,7 +151,7 @@
             justify-content: center;
             align-items: center;
             transition: opacity 0.7s ease-in-out, transform 0.7s ease-in-out;
-            overflow: visible;
+            overflow: hidden; 
             padding: 10px;
             box-sizing: border-box;
             aspect-ratio: 1 / 1;
@@ -161,7 +160,6 @@
             max-width: 100%;
             max-height: 100%;
             display: block;
-            overflow: visible !important;
         }
 
         .slide-out-left { opacity: 0; transform: translateX(-100%); }
@@ -208,20 +206,22 @@
             font-weight: bold;
             background-color: #e7f3ff;
         }
+        
         .flatpickr-day.has-creation::after {
             content: attr(data-count);
             position: absolute;
-            bottom: 1px;
-            right: 1px;
+            bottom: -2px; 
+            right: -2px;
             background-color: #1877f2;
             color: white;
             border-radius: 50%;
-            width: 18px;
-            height: 18px;
+            width: 15px;
+            height: 15px;
             font-size: 10px;
-            line-height: 18px;
-            text-align: center;
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .flatpickr-day.selected, .flatpickr-day.selected:hover {
             background: #1877f2 !important;
@@ -398,9 +398,9 @@
         document.addEventListener('DOMContentLoaded', initialize);
 
         async function initialize() {
-            loadingOverlay.style.display = 'flex'; // Mostra l'overlay di caricamento
+            loadingOverlay.style.display = 'flex'; 
             await loadAllSvgData();
-            loadingOverlay.style.display = 'none'; // Nasconde l'overlay dopo il caricamento
+            loadingOverlay.style.display = 'none';
             
             setupEventListeners();
             initCalendar();
@@ -423,15 +423,12 @@
 
             let updatedSvgString = new XMLSerializer().serializeToString(svgDoc);
             
-            // Aggiorna i riferimenti url(#id)
             updatedSvgString = updatedSvgString.replace(/url\s*\(\s*#([^)]+)\s*\)/g, (match, oldId) => {
                 return idMap.has(oldId) ? `url(#${idMap.get(oldId)})` : match;
             });
-            // Aggiorna i riferimenti href="#id"
             updatedSvgString = updatedSvgString.replace(/href\s*=\s*"\s*#([^"]+)\s*"/g, (match, oldId) => {
                 return idMap.has(oldId) ? `href="#${idMap.get(oldId)}"` : match;
             });
-            // Aggiorna i riferimenti xlink:href="#id"
             updatedSvgString = updatedSvgString.replace(/xlink:href\s*=\s*"\s*#([^"]+)\s*"/g, (match, oldId) => {
                 return idMap.has(oldId) ? `xlink:href="#${idMap.get(oldId)}"` : match;
             });
@@ -474,15 +471,9 @@
             const svgText = await response.text();
 
             const parser = new DOMParser();
-            // Usiamo "application/xml" per un parsing dei metadati più affidabile
             const svgDoc = parser.parseFromString(svgText, "application/xml");
             
-            // --- INIZIO LOGICA CORRETTA ---
-
-            // Definiamo il namespace corretto per gli elementi 'dc' (Dublin Core)
             const dcNamespace = 'http://purl.org/dc/elements/1.1/';
-
-            // Funzione di supporto per estrarre il contenuto testuale in modo sicuro
             const getTextContentByNS = (parentElement, tagName) => {
                 const elements = parentElement.getElementsByTagNameNS(dcNamespace, tagName);
                 return elements.length > 0 ? elements[0].textContent : null;
@@ -491,21 +482,22 @@
             const title = getTextContentByNS(svgDoc, 'title');
             const description = getTextContentByNS(svgDoc, 'description');
             const dateString = getTextContentByNS(svgDoc, 'date');
-            
-            // --- FINE LOGICA CORRETTA ---
 
             if (!dateString) {
                 console.warn(`SVG ${fileName} non contiene '<dc:date>' nei metadati. File saltato.`);
-                // Aggiungiamo un controllo per errori di parsing
                 if (svgDoc.getElementsByTagName('parsererror').length > 0) {
                      console.error(`Errore di parsing in ${fileName}:`, svgDoc.getElementsByTagName('parsererror')[0].textContent);
                 }
                 return null;
             }
 
-            const [day, month, year] = dateString.split('-').map(Number);
-            const dateObject = new Date(year, month - 1, day);
-            const isoDate = dateObject.toISOString().split('T')[0];
+          
+            const [day, month, year] = dateString.split('-');
+
+          
+            const isoDate = `${year}-${month}-${day}`;
+
+            const dateObject = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
             
             creationCounts[isoDate] = (creationCounts[isoDate] || 0) + 1;
 
@@ -557,7 +549,7 @@
         function renderGallery(data, container) {
             container.innerHTML = '';
             if (data.length === 0) {
-                container.innerHTML = '<p>No creations found.</p>';
+                container.innerHTML = '<p>Nessuna creazione trovata per questa selezione.</p>';
                 return;
             }
             data.forEach(item => {
@@ -617,15 +609,25 @@
             flatpickrInstance = flatpickr(calendarContainer, {
                 inline: true,
                 onDayCreate: function(dObj, dStr, fp, dayElem) {
-                    const date = dayElem.dateObj.toISOString().split('T')[0];
-                    if (creationCounts[date]) {
+                    const date = dayElem.dateObj;
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const keyDate = `${year}-${month}-${day}`;
+
+                    if (creationCounts[keyDate]) {
                         dayElem.classList.add('has-creation');
-                        dayElem.dataset.count = creationCounts[date];
+                        dayElem.dataset.count = creationCounts[keyDate];
                     }
                 },
                 onChange: function(selectedDates, dateStr, instance) {
                     if (selectedDates.length > 0) {
-                        const selectedIsoDate = selectedDates[0].toISOString().split('T')[0];
+                        const date = selectedDates[0];
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const selectedIsoDate = `${year}-${month}-${day}`;
+
                         filterByDate(selectedIsoDate);
                         renderDayScroller(selectedIsoDate);
                         dayScrollerContainer.style.display = 'block';
