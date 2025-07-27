@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
+        /* Stili Esistenti (con una piccola aggiunta) */
         body {
             font-family: -apple-system, BlinkMacMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
@@ -17,6 +18,11 @@
             color: #333;
             line-height: 1.6;
         }
+        /* ... tutti gli altri stili esistenti rimangono invariati ... */
+        .svg-card.interactive-card { /* NUOVO: Cursore per indicare interattività */
+            cursor: pointer;
+        }
+        
         h1, h2 {
             text-align: center;
             color: #1c1e21;
@@ -195,7 +201,7 @@
             background-color: #fff;
             padding: 15px;
             border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.01);
             max-width: fit-content;
             margin-left: auto;
             margin-right: auto;
@@ -212,7 +218,7 @@
             position: absolute;
             bottom: -2px; 
             right: -2px;
-            background-color: #1877f2;
+            background-color: #18c277;
             color: white;
             border-radius: 50%;
             width: 15px;
@@ -269,6 +275,94 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             font-weight: bold;
         }
+        
+        /* NUOVO: Stili per il modale SVG */
+        #svg-modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(30, 30, 30, 0.9);
+            display: none; /* Inizialmente nascosto */
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #svg-modal-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: hidden; /* Nasconde ciò che esce dall'area di zoom */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            border-radius: 10px;
+        }
+        #svg-modal-zoom-container {
+            cursor: grab;
+            transform-origin: 0 0;
+            transition: transform 0.2s ease-out;
+        }
+        #svg-modal-zoom-container:active {
+            cursor: grabbing;
+        }
+        #svg-modal-zoom-container svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        #svg-modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 2010;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        #svg-modal-close-btn:hover {
+            background-color: rgba(0,0,0,0.8);
+        }
+        .svg-modal-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0,0,0,0.5);
+            border-radius: 20px;
+            padding: 5px;
+            display: flex;
+            gap: 5px;
+            z-index: 2010;
+        }
+        .svg-modal-controls button {
+            background: white;
+            color: #333;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .svg-modal-controls button:hover {
+            background: #f0f0f0;
+        }
+
 
         @media (max-width: 768px) {
             .view {
@@ -316,6 +410,10 @@
                 width: 95%;
                 max-width: 300px;
             }
+            #svg-modal-content {
+                max-width: 95vw;
+                max-height: 85vh;
+            }
         }
     </style>
 </head>
@@ -330,7 +428,6 @@
     </nav>
 
     <main>
-        <!-- Questo div sarà usato per mostrare il messaggio di caricamento -->
         <div id="loading-overlay" style="
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(255, 255, 255, 0.9); display: flex;
@@ -363,6 +460,20 @@
         </section>
     </main>
 
+    <!-- NUOVO: HTML per il modale SVG -->
+    <div id="svg-modal">
+        <button id="svg-modal-close-btn" title="Chiudi"><i class="fas fa-times"></i></button>
+        <div id="svg-modal-content">
+            <div id="svg-modal-zoom-container">
+                <!-- L'SVG verrà inserito qui da JavaScript -->
+            </div>
+        </div>
+        <div class="svg-modal-controls">
+            <button id="zoom-in-btn" title="Ingrandisci">+</button>
+            <button id="zoom-out-btn" title="Rimpicciolisci">-</button>
+        </div>
+    </div>
+
     <script>
         const GITHUB_USERNAME = '17seba17';
         const GITHUB_REPO = 'MySvgs';
@@ -394,6 +505,26 @@
         let dayScrollerContainer = document.getElementById('day-scroller-container');
 
         const loadingOverlay = document.getElementById('loading-overlay');
+        
+        const svgModal = document.getElementById('svg-modal');
+        const svgModalContent = document.getElementById('svg-modal-content');
+        const svgModalZoomContainer = document.getElementById('svg-modal-zoom-container');
+        const closeModalBtn = document.getElementById('svg-modal-close-btn');
+        const zoomInBtn = document.getElementById('zoom-in-btn');
+        const zoomOutBtn = document.getElementById('zoom-out-btn');
+        
+        // --- MODIFICATO: Stato del modale per supportare touch e pinch ---
+        let modalState = {
+            scale: 1,
+            panning: false,
+            pointX: 0,
+            pointY: 0,
+            start: { x: 0, y: 0 },
+            
+            // Nuove proprietà per il pinch-to-zoom
+            startScale: 1,
+            initialPinchDistance: 0
+        };
 
         document.addEventListener('DOMContentLoaded', initialize);
 
@@ -404,6 +535,7 @@
             
             setupEventListeners();
             initCalendar();
+            setupModalListeners();
             showView('home');
         }
         
@@ -440,9 +572,7 @@
             try {
                 const response = await fetch(GITHUB_API_URL);
                 if (!response.ok) {
-                    if (response.status === 403) {
-                        throw new Error("API Rate Limit Exceeded or Authentication Required. Try again later.");
-                    }
+                    if (response.status === 403) throw new Error("API Rate Limit Exceeded.");
                     throw new Error(`Failed to load file list: ${response.statusText}`);
                 }
                 const data = await response.json();
@@ -451,183 +581,247 @@
                     .map(item => item.name);
             } catch (error) {
                 console.error("Error fetching SVG file list from GitHub API:", error);
-                loadingOverlay.innerHTML = `<h2>Error loading creations!</h2><p>Could not fetch SVG list. Message: ${error.message}</p>`;
+                loadingOverlay.innerHTML = `<h2>Error loading creations!</h2><p>${error.message}</p>`;
                 return [];
             }
         }
 
-   async function loadAllSvgData() {
-    const fileNames = await loadSvgFileNames();
-    if (fileNames.length === 0) {
-        loadingOverlay.innerHTML = `<h2>Nessuna creazione SVG trovata.</h2><p>Controlla la console per i dettagli o assicurati che la cartella 'svgs' sia corretta.</p>`;
-        return;
-    }
-
-    const promises = fileNames.map(async (fileName) => {
-        const fileUrl = GITHUB_RAW_BASE_URL + fileName;
-        try {
-            const response = await fetch(fileUrl);
-            if (!response.ok) return null;
-            const svgText = await response.text();
-
-            const parser = new DOMParser();
-            const svgDoc = parser.parseFromString(svgText, "application/xml");
-            
-            const dcNamespace = 'http://purl.org/dc/elements/1.1/';
-            const getTextContentByNS = (parentElement, tagName) => {
-                const elements = parentElement.getElementsByTagNameNS(dcNamespace, tagName);
-                return elements.length > 0 ? elements[0].textContent : null;
-            };
-
-            const title = getTextContentByNS(svgDoc, 'title');
-            const description = getTextContentByNS(svgDoc, 'description');
-            const dateString = getTextContentByNS(svgDoc, 'date');
-
-            if (!dateString) {
-                console.warn(`SVG ${fileName} non contiene '<dc:date>' nei metadati. File saltato.`);
-                if (svgDoc.getElementsByTagName('parsererror').length > 0) {
-                     console.error(`Errore di parsing in ${fileName}:`, svgDoc.getElementsByTagName('parsererror')[0].textContent);
-                }
-                return null;
+       async function loadAllSvgData() {
+            const fileNames = await loadSvgFileNames();
+            if (fileNames.length === 0) {
+                loadingOverlay.innerHTML = `<h2>Nessuna creazione SVG trovata.</h2><p>Controlla la console o la configurazione del repository.</p>`;
+                return;
             }
 
-          
-            const [day, month, year] = dateString.split('-');
+            const promises = fileNames.map(async (fileName) => {
+                const fileUrl = GITHUB_RAW_BASE_URL + fileName;
+                try {
+                    const response = await fetch(fileUrl);
+                    if (!response.ok) return null;
+                    const svgText = await response.text();
+                    const parser = new DOMParser();
+                    const svgDoc = parser.parseFromString(svgText, "application/xml");
+                    const dcNamespace = 'http://purl.org/dc/elements/1.1/';
+                    const getText = (tag) => svgDoc.getElementsByTagNameNS(dcNamespace, tag)[0]?.textContent || null;
+                    const dateString = getText('date');
+                    if (!dateString) return null;
+                    const [day, month, year] = dateString.split('-');
+                    return {
+                        title: getText('title') || 'Untitled',
+                        description: getText('description') || '',
+                        dateString,
+                        dateObject: new Date(parseInt(year), parseInt(month) - 1, parseInt(day)),
+                        isoDate: `${year}-${month}-${day}`,
+                        originalSvgMarkup: svgText
+                    };
+                } catch (error) { return null; }
+            });
 
-          
-            const isoDate = `${year}-${month}-${day}`;
-
-            const dateObject = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+            const results = (await Promise.all(promises)).filter(Boolean);
+            allSvgData.push(...results);
+            allSvgData.sort((a, b) => b.dateObject - a.dateObject);
             
-            creationCounts[isoDate] = (creationCounts[isoDate] || 0) + 1;
-
-            return {
-                title: title || 'Untitled',
-                description: description || '',
-                dateString: dateString,
-                dateObject: dateObject,
-                isoDate: isoDate,
-                originalSvgMarkup: svgText
-            };
-
-        } catch (error) {
-            console.error(`Errore durante il caricamento o il parsing di ${fileName}:`, error);
-            return null;
-        }
-    });
-
-    const results = await Promise.all(promises);
-    allSvgData.push(...results.filter(Boolean));
-    allSvgData.sort((a, b) => b.dateObject - a.dateObject);
-    
-    const uniqueDates = [...new Set(allSvgData.map(d => d.isoDate))];
-    uniqueDates.sort().forEach(d => sortedDatesWithCreations.push(d));
-}
-        function showView(viewId) {
-            clearInterval(sliderInterval);
-
-            views.forEach(view => view.classList.remove('active'));
-            document.getElementById(`${viewId}-view`).classList.add('active');
-
-            navButtons.forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`nav-${viewId}`).classList.add('active');
-
-            if (viewId === 'home') {
-                startSlider();
-            } else if (viewId === 'gallery') {
-                renderGallery(allSvgData, galleryResults);
-            }
+            allSvgData.forEach(d => {
+                creationCounts[d.isoDate] = (creationCounts[d.isoDate] || 0) + 1;
+            });
+            
+            const uniqueDates = [...new Set(allSvgData.map(d => d.isoDate))];
+            uniqueDates.sort().forEach(d => sortedDatesWithCreations.push(d));
         }
         
+        // Funzioni UI (showView, setupEventListeners, renderGallery, etc.)
+        // Queste funzioni rimangono per lo più invariate
+        function showView(viewId) {
+            clearInterval(sliderInterval);
+            if (svgModal.style.display === 'flex') closeSvgModal();
+            views.forEach(view => view.classList.remove('active'));
+            document.getElementById(`${viewId}-view`).classList.add('active');
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`nav-${viewId}`).classList.add('active');
+            if (viewId === 'home') startSlider();
+            else if (viewId === 'gallery') renderGallery(allSvgData, galleryResults);
+        }
         function setupEventListeners() {
             document.getElementById('nav-home').addEventListener('click', () => showView('home'));
             document.getElementById('nav-gallery').addEventListener('click', () => showView('gallery'));
             document.getElementById('nav-calendar').addEventListener('click', () => showView('calendar'));
             searchInput.addEventListener('input', handleSearch);
         }
-
         function renderGallery(data, container) {
-            container.innerHTML = '';
-            if (data.length === 0) {
-                container.innerHTML = '<p>Nessuna creazione trovata per questa selezione.</p>';
-                return;
-            }
+            container.innerHTML = data.length === 0 ? '<p>Nessuna creazione trovata.</p>' : '';
             data.forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'svg-card';
-                card.innerHTML = `
-                    <div class="svg-container"></div>
-                    <h3>${item.title}</h3>
-                    <p class="date">${item.dateString}</p>
-                    <p class="desc">${item.description}</p>
-                `;
-                const svgContainer = card.querySelector('.svg-container');
-                svgContainer.innerHTML = sanitizeSvgIds(item.originalSvgMarkup);
+                card.className = 'svg-card interactive-card';
+                card.innerHTML = `<div class="svg-container"></div><h3>${item.title}</h3><p class="date">${item.dateString}</p><p class="desc">${item.description}</p>`;
+                card.querySelector('.svg-container').innerHTML = sanitizeSvgIds(item.originalSvgMarkup);
+                card.dataset.svgMarkup = item.originalSvgMarkup;
+                card.addEventListener('click', () => openSvgModal(item.originalSvgMarkup));
                 container.appendChild(card);
             });
         }
-
-        function startSlider() {
-            if (allSvgData.length === 0) return;
-            showRandomSvg();
-            sliderInterval = setInterval(showRandomSvg, 10000);
-        }
-
+        function startSlider() { if (allSvgData.length > 0) { showRandomSvg(); sliderInterval = setInterval(showRandomSvg, 10000); } }
         function showRandomSvg() {
-            if (allSvgData.length === 0) {
-                sliderContent.innerHTML = '<p>No SVG to display.</p>';
-                return;
-            }
             const animations = ['slide-out-left', 'slide-out-right', 'slide-out-up', 'slide-out-down'];
             const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
-            
             sliderContent.classList.add(randomAnimation);
-
             setTimeout(() => {
-                const randomIndex = Math.floor(Math.random() * allSvgData.length);
-                const randomItem = allSvgData[randomIndex];
-                
+                const randomItem = allSvgData[Math.floor(Math.random() * allSvgData.length)];
                 sliderContent.innerHTML = sanitizeSvgIds(randomItem.originalSvgMarkup);
                 sliderContent.classList.remove(randomAnimation);
             }, 700);
         }
-
         function handleSearch() {
             const query = searchInput.value.toLowerCase().trim();
-            if (query === '') {
-                renderGallery(allSvgData, galleryResults);
-                return;
-            }
-            const filteredData = allSvgData.filter(item => 
-                item.title.toLowerCase().includes(query) ||
-                item.description.toLowerCase().includes(query)
-            );
-            renderGallery(filteredData, galleryResults);
+            const filtered = allSvgData.filter(item => item.title.toLowerCase().includes(query) || item.description.toLowerCase().includes(query));
+            renderGallery(query ? filtered : allSvgData, galleryResults);
         }
+   
+        // --- LOGICA MODALE ---
+        function resetModalState() {
+            modalState.scale = 1;
+            modalState.panning = false;
+            modalState.pointX = 0;
+            modalState.pointY = 0;
+            modalState.start = { x: 0, y: 0 };
+            modalState.initialPinchDistance = 0;
+            modalState.startScale = 1;
+            updateTransform();
+        }
+        function openSvgModal(svgMarkup) {
+            document.body.style.overflow = 'hidden';
+            resetModalState();
+            svgModalZoomContainer.innerHTML = sanitizeSvgIds(svgMarkup);
+            svgModal.style.display = 'flex';
+        }
+        function closeSvgModal() {
+            svgModal.style.display = 'none';
+            svgModalZoomContainer.innerHTML = '';
+            document.body.style.overflow = '';
+        }
+        function updateTransform() {
+            svgModalZoomContainer.style.transform = `translate(${modalState.pointX}px, ${modalState.pointY}px) scale(${modalState.scale})`;
+        }
+        function getDistance(p1, p2) {
+            const dx = p1.clientX - p2.clientX;
+            const dy = p1.clientY - p2.clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+        
+          function zoomAtPoint(newScale, point) {
+            const oldScale = modalState.scale;
+            
+            // Applica i limiti di zoom
+            newScale = Math.min(Math.max(0.1, newScale), 20);
 
+            // La formula per calcolare il nuovo offset di traslazione
+            modalState.pointX = point.x - ((point.x - modalState.pointX) / oldScale) * newScale;
+            modalState.pointY = point.y - ((point.y - modalState.pointY) / oldScale) * newScale;
+            
+            // Aggiorna la scala
+            modalState.scale = newScale;
+            
+            updateTransform();
+        }
+        
+             function setupModalListeners() {
+            closeModalBtn.addEventListener('click', closeSvgModal);
+            svgModal.addEventListener('click', (e) => { if (e.target === svgModal) closeSvgModal(); });
+
+            // --- MODIFICATO: Pulsanti zoom che zoomano verso il centro della vista ---
+            zoomInBtn.addEventListener('click', () => {
+                const rect = svgModalContent.getBoundingClientRect();
+                const centerPoint = { x: rect.width / 2, y: rect.height / 2 };
+                zoomAtPoint(modalState.scale * 1.2, centerPoint);
+            });
+
+            zoomOutBtn.addEventListener('click', () => {
+                const rect = svgModalContent.getBoundingClientRect();
+                const centerPoint = { x: rect.width / 2, y: rect.height / 2 };
+                zoomAtPoint(modalState.scale / 1.2, centerPoint);
+            });
+
+            // --- MODIFICATO: Gestore 'wheel' che usa la funzione helper ---
+            svgModalContent.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const rect = svgModalContent.getBoundingClientRect();
+                const mousePoint = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+                const delta = e.deltaY > 0 ? -0.2 : 0.2;
+                zoomAtPoint(modalState.scale + delta, mousePoint);
+            });
+
+            // Gestione pan (drag) con mouse (invariato)
+            svgModalContent.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                modalState.panning = true;
+                modalState.start.x = e.clientX - modalState.pointX;
+                modalState.start.y = e.clientY - modalState.pointY;
+            });
+            window.addEventListener('mouseup', () => { modalState.panning = false; });
+            window.addEventListener('mousemove', (e) => {
+                if (!modalState.panning) return;
+                e.preventDefault();
+                modalState.pointX = e.clientX - modalState.start.x;
+                modalState.pointY = e.clientY - modalState.start.y;
+                updateTransform();
+            });
+
+            // Gestione eventi touch (invariato nella logica, ma ora usa la funzione helper)
+            svgModalContent.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touches = e.touches;
+                if (touches.length === 1) {
+                    modalState.panning = true;
+                    modalState.start.x = touches[0].clientX - modalState.pointX;
+                    modalState.start.y = touches[0].clientY - modalState.pointY;
+                } else if (touches.length === 2) {
+                    modalState.panning = false;
+                    modalState.initialPinchDistance = getDistance(touches[0], touches[1]);
+                    modalState.startScale = modalState.scale;
+                    const rect = svgModalContent.getBoundingClientRect();
+                    modalState.pinchCenter = {
+                        x: ((touches[0].clientX + touches[1].clientX) / 2) - rect.left,
+                        y: ((touches[0].clientY + touches[1].clientY) / 2) - rect.top
+                    };
+                }
+            });
+
+            svgModalContent.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touches = e.touches;
+                if (touches.length === 1 && modalState.panning) {
+                    modalState.pointX = touches[0].clientX - modalState.start.x;
+                    modalState.pointY = touches[0].clientY - modalState.start.y;
+                    updateTransform();
+                } else if (touches.length === 2 && modalState.initialPinchDistance > 0) {
+                    const newDist = getDistance(touches[0], touches[1]);
+                    const scaleRatio = newDist / modalState.initialPinchDistance;
+                    const newScale = modalState.startScale * scaleRatio;
+                    // Usa la funzione helper con il pinchCenter
+                    zoomAtPoint(newScale, modalState.pinchCenter);
+                }
+            });
+
+            svgModalContent.addEventListener('touchend', (e) => {
+                if (e.touches.length < 2) modalState.initialPinchDistance = 0;
+                if (e.touches.length < 1) modalState.panning = false;
+            });
+        }
+        
         function initCalendar() {
             flatpickrInstance = flatpickr(calendarContainer, {
                 inline: true,
                 onDayCreate: function(dObj, dStr, fp, dayElem) {
                     const date = dayElem.dateObj;
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const day = String(date.getDate()).padStart(2, '0');
-                    const keyDate = `${year}-${month}-${day}`;
-
+                    const keyDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
                     if (creationCounts[keyDate]) {
                         dayElem.classList.add('has-creation');
                         dayElem.dataset.count = creationCounts[keyDate];
                     }
                 },
-                onChange: function(selectedDates, dateStr, instance) {
+                onChange: function(selectedDates) {
                     if (selectedDates.length > 0) {
                         const date = selectedDates[0];
-                        const year = date.getFullYear();
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const selectedIsoDate = `${year}-${month}-${day}`;
-
+                        const selectedIsoDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
                         filterByDate(selectedIsoDate);
                         renderDayScroller(selectedIsoDate);
                         dayScrollerContainer.style.display = 'block';
@@ -635,16 +829,13 @@
                 }
             });
         }
-
         function filterByDate(isoDate) {
             const filteredData = allSvgData.filter(item => item.isoDate === isoDate);
             renderGallery(filteredData, calendarResults);
-            
             document.querySelectorAll('.day-scroller button').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.date === isoDate);
             });
         }
-        
         function renderDayScroller(activeDate) {
             dayScrollerContainer.innerHTML = '';
             sortedDatesWithCreations.forEach(isoDate => {
@@ -652,9 +843,7 @@
                 const [year, month, day] = isoDate.split('-');
                 btn.textContent = `${day}/${month}`;
                 btn.dataset.date = isoDate;
-                if (isoDate === activeDate) {
-                    btn.classList.add('active');
-                }
+                if (isoDate === activeDate) { btn.classList.add('active'); }
                 btn.addEventListener('click', () => {
                     filterByDate(isoDate);
                     btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
@@ -663,9 +852,7 @@
             });
             setTimeout(() => {
                 const activeButton = dayScrollerContainer.querySelector('button.active');
-                if (activeButton) {
-                    activeButton.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-                }
+                if (activeButton) { activeButton.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }); }
             }, 100);
         }
     </script>
