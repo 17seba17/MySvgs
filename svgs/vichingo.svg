@@ -2,9 +2,6 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   data-date="24-07-2025"
-   data-title="vichingo"
-   data-description="un vichingo che sta urlando"
    width="100mm"
    height="100mm"
    viewBox="0 0 100 100"
@@ -15,7 +12,12 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title1">Un vichingo</title>
   <sodipodi:namedview
      id="namedview1"
      pagecolor="#ffffff"
@@ -28,7 +30,7 @@
      inkscape:document-units="mm"
      inkscape:zoom="1.4142136"
      inkscape:cx="106.06601"
-     inkscape:cy="284.61047"
+     inkscape:cy="283.90337"
      inkscape:window-width="1920"
      inkscape:window-height="991"
      inkscape:window-x="-9"
@@ -686,4 +688,15 @@
          inkscape:original-d="m 217.78888,233.34523 c 3.33997,9.2172 5.36167,18.83807 5.54434,28.62964 l 0.11198,1.06885" />
     </g>
   </g>
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Un vichingo</dc:title>
+        <dc:date>24-07-2025</dc:date>
+        <dc:description>Un vichingo che sta urlando</dc:description>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
 </svg>
