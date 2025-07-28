@@ -385,6 +385,23 @@
             #home-view .slider { width: 95%; max-width: 300px; }
             #svg-modal-content { max-width: 95vw; max-height: 85vh; }
         }
+        
+.description-tooltip {
+    position: fixed; /* Si posiziona rispetto alla finestra del browser */
+    display: none;   /* Nascosto di default */
+    background-color: rgba(40, 40, 40, 0.95);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    line-height: 1.5;
+    max-width: 350px; /* Larghezza massima per evitare che sia troppo grande */
+    z-index: 3000;    /* Assicura che sia sopra tutto il resto (tranne il modale) */
+    pointer-events: none; /* Impedisce al tooltip di interferire con gli eventi del mouse */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    text-align: left;
+    white-space: pre-wrap; /* Mantiene le andate a capo presenti nella descrizione */
+}
     </style>
 </head>
 <body>
@@ -484,6 +501,7 @@
         const zoomInBtn = document.getElementById('zoom-in-btn');
                 const centerImageBtn = document.getElementById('center-image-btn');
         const zoomOutBtn = document.getElementById('zoom-out-btn');
+        let descriptionTooltip;
         
         // --- MODIFICATO: Stato del modale per supportare touch e pinch ---
         let modalState = {
@@ -500,17 +518,17 @@
 
         document.addEventListener('DOMContentLoaded', initialize);
 
-        async function initialize() {
-            loadingOverlay.style.display = 'flex'; 
-            await loadAllSvgData();
-            loadingOverlay.style.display = 'none';
-            
-            setupEventListeners();
-            initCalendar();
-            setupModalListeners();
-            showView('home');
-        }
-        
+    async function initialize() {
+    loadingOverlay.style.display = 'flex'; 
+    createDescriptionTooltip(); // <-- NUOVA CHIAMATA
+    await loadAllSvgData();
+    loadingOverlay.style.display = 'none';
+    
+    setupEventListeners();
+    initCalendar();
+    setupModalListeners();
+    showView('home');
+}
         function sanitizeSvgIds(svgMarkup) {
             const uniqueSuffix = 'uid-' + Math.random().toString(36).substring(2, 9);
             const parser = new DOMParser();
@@ -619,18 +637,42 @@
             document.getElementById('nav-calendar').addEventListener('click', () => showView('calendar'));
             searchInput.addEventListener('input', handleSearch);
         }
-        function renderGallery(data, container) {
-            container.innerHTML = data.length === 0 ? '<p>Nessuna creazione trovata.</p>' : '';
-            data.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'svg-card interactive-card';
-                card.innerHTML = `<div class="svg-container"></div><h3>${item.title}</h3><p class="date">${item.dateString}</p><p class="desc">${item.description}</p>`;
-                card.querySelector('.svg-container').innerHTML = sanitizeSvgIds(item.originalSvgMarkup);
-                card.dataset.svgMarkup = item.originalSvgMarkup;
-                card.addEventListener('click', () => openSvgModal(item.originalSvgMarkup));
-                container.appendChild(card);
-            });
-        }
+function renderGallery(data, container) {
+    container.innerHTML = data.length === 0 ? '<p>Nessuna creazione trovata.</p>' : '';
+    data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'svg-card interactive-card';
+        // Aggiungiamo il paragrafo della descrizione con il suo contenuto
+        card.innerHTML = `
+            <div class="svg-container"></div>
+            <h3>${item.title}</h3>
+            <p class="date">${item.dateString}</p>
+            <p class="desc">${item.description}</p>`;
+        
+        card.querySelector('.svg-container').innerHTML = sanitizeSvgIds(item.originalSvgMarkup);
+        card.dataset.svgMarkup = item.originalSvgMarkup;
+        card.addEventListener('click', () => openSvgModal(item.originalSvgMarkup));
+
+        const descEl = card.querySelector('.desc');
+        // Salviamo la descrizione completa in un attributo dati per un facile accesso
+        descEl.dataset.fullDesc = item.description;
+
+        // Aggiungiamo la card al DOM
+        container.appendChild(card);
+
+        // ORA CONTROLLIAMO SE IL TESTO È TAGLIATO
+        // Usiamo un piccolo timeout per assicurarci che il browser abbia calcolato le dimensioni dell'elemento
+        setTimeout(() => {
+            // Se l'altezza totale del contenuto (scrollHeight) è maggiore dell'altezza visibile (clientHeight),
+            // significa che il testo è stato tagliato.
+            if (descEl.scrollHeight > descEl.clientHeight) {
+                descEl.style.cursor = 'help'; // Cambia il cursore per dare un indizio visivo
+                descEl.addEventListener('mouseenter', showDescriptionTooltip);
+                descEl.addEventListener('mouseleave', hideDescriptionTooltip);
+            }
+        }, 10); // Un piccolo ritardo è sufficiente
+    });
+}
         function startSlider() { if (allSvgData.length > 0) { showRandomSvg(); sliderInterval = setInterval(showRandomSvg, 10000); } }
         function showRandomSvg() {
             const animations = ['slide-out-left', 'slide-out-right', 'slide-out-up', 'slide-out-down'];
@@ -649,6 +691,45 @@
         }
         
         
+        
+        // Inserisci questa nuova funzione dopo la dichiarazione delle variabili
+function createDescriptionTooltip() {
+    descriptionTooltip = document.createElement('div');
+    descriptionTooltip.className = 'description-tooltip';
+    document.body.appendChild(descriptionTooltip);
+}
+
+// Inserisci queste due nuove funzioni in una sezione logica, 
+// per esempio prima della logica del modale.
+
+function showDescriptionTooltip(event) {
+    const el = event.currentTarget;
+    const fullText = el.dataset.fullDesc;
+
+    descriptionTooltip.textContent = fullText;
+    descriptionTooltip.style.display = 'block';
+
+    // Calcoliamo la posizione migliore per il tooltip
+    const tooltipRect = descriptionTooltip.getBoundingClientRect();
+    let x = event.clientX + 15;
+    let y = event.clientY + 15;
+
+    // Se esce dallo schermo a destra, lo mettiamo a sinistra del cursore
+    if (x + tooltipRect.width > window.innerWidth) {
+        x = event.clientX - tooltipRect.width - 15;
+    }
+    // Se esce dallo schermo in basso, lo mettiamo sopra il cursore
+    if (y + tooltipRect.height > window.innerHeight) {
+        y = event.clientY - tooltipRect.height - 15;
+    }
+
+    descriptionTooltip.style.left = `${x}px`;
+    descriptionTooltip.style.top = `${y}px`;
+}
+
+function hideDescriptionTooltip() {
+    descriptionTooltip.style.display = 'none';
+}
 // --- LOGICA MODALE ---
 // Funzioni di base invariate (reset, open, close, updateTransform, getDistance)
 
@@ -728,7 +809,7 @@ function setupModalListeners() {
     });
         centerImageBtn.addEventListener('click', () => {
                svgModalZoomContainer.style.transform = `translate(0px, 0px) scale(1)`;
-
+             resetModalState();
       
     });
 
